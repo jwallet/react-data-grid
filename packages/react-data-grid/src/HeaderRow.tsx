@@ -37,6 +37,7 @@ export default class HeaderRow<R> extends React.Component<HeaderRowProps<R>> {
   private readonly cells = new Map<keyof R, HeaderCell<R>>();
 
   shouldComponentUpdate(nextProps: HeaderRowProps<R>) {
+    console.log('test');
     return (
       nextProps.width !== this.props.width
       || nextProps.height !== this.props.height

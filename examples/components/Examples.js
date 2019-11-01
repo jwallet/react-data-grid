@@ -37,6 +37,7 @@ import ScrollToRowIndex from '../scripts/example28-scroll-to-row-index';
 import DescendingFirstSortable from '../scripts/example29-descendingFirstSortable';
 import SelectionRangeEvents from '../scripts/example30-selection-range-events';
 import IsScrolling from '../scripts/example31-isScrolling';
+import ColumnHeaderRenderer from '../scripts/example32-column-header-renderer';
 
 export default function Examples({ match }) {
   return (
@@ -86,7 +87,8 @@ export default function Examples({ match }) {
               <Route path="/examples/scroll-to-row-index" component={ScrollToRowIndex} />
               <Route path="/examples/descendingFirstSortable" component={DescendingFirstSortable} />
               <Route path="/examples/selection-range-events" component={SelectionRangeEvents} />
-              <Route path="/examples/isScrolling" component={IsScrolling} />
+              <Route path="/examples/is-scrolling" component={IsScrolling} />
+              <Route path="/examples/column-header-renderer" component={ColumnHeaderRenderer} />
               <Redirect from={`${match.url}`} to={`${match.url}/all-features`} />
             </Switch>
           </div>

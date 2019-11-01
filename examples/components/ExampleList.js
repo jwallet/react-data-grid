@@ -37,7 +37,8 @@ export default class ExampleList extends React.Component {
         <li><Link to="/examples/scroll-to-row-index">Scroll To Row Index Example</Link></li>
         <li><Link to="/examples/descendingFirstSortable">Descending First Sortable Example</Link></li>
         <li><Link to="/examples/selection-range-events">Selection Range Events Example</Link></li>
-        <li><Link to="/examples/isScrolling">IsScrolling Example</Link></li>
+        <li><Link to="/examples/is-scrolling">IsScrolling Example</Link></li>
+        <li><Link to="/examples/column-header-renderer">Column Custom Header Renderer</Link></li>
       </ul>
     );
   }
