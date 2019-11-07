@@ -1,22 +1,13 @@
 {
-  "version": "7.0.0-canary.5",
-  "ignoreChanges": [
-    "*.spec.*",
-    "*.md"
-  ],
+  "version": "7.0.0-canary.5-0.1.0",
+  "ignoreChanges": ["*.spec.*", "*.md"],
   "command": {
     "publish": {
-      "allowBranch": [
-        "master",
-        "next",
-        "canary"
-      ],
+      "allowBranch": ["master", "next", "canary", "canary-extended"],
       "message": "Publish %s"
     },
     "bootstrap": {
-      "npmClientArgs": [
-        "--no-package-lock"
-      ]
+      "npmClientArgs": ["--no-package-lock"]
     }
   }
 }
