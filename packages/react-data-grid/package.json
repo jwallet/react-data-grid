@@ -1,6 +1,6 @@
 {
-  "name": "react-data-grid",
-  "version": "7.0.0-canary.5-0.1.0",
+  "name": "@vooban/react-data-grid",
+  "version": "0.1.12",
   "description": "Excel-like grid component built with React, with editors, keyboard navigation, copy & paste, and the like",
   "author": "Vooban & Adazzle",
   "license": "MIT",
@@ -12,7 +12,7 @@
     "lib"
   ],
   "sideEffects": false,
-  "repository": "adazzle/react-data-grid",
+  "repository": "Vooban/react-data-grid",
   "homepage": "https://github.com/adazzle/react-data-grid",
   "bugs": {
     "url": "https://github.com/adazzle/react-data-grid/issues"
@@ -40,5 +40,6 @@
     "@types/react-is": "^16.7",
     "react": "^16.8",
     "react-dom": "^16.8"
-  }
+  },
+  "gitHead": "fc73ba2f737cf6711ca4f7ea8c7a01161ba690c9"
 }

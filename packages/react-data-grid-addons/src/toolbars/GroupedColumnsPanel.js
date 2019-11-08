@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DragItemTypes } from 'react-data-grid';
+import { DragItemTypes } from '@vooban/react-data-grid';
 import { DropTarget } from 'react-dnd';
 
 import GroupedColumnButton from './GroupedColumnButton';
@@ -17,13 +17,16 @@ class GroupedColumnsPanel extends Component {
   };
 
   static defaultProps = {
-    noColumnsSelectedMessage: 'Drag a column header here to group by that column',
+    noColumnsSelectedMessage:
+      'Drag a column header here to group by that column',
     panelDescription: 'Drag a column header here to group by that column'
   };
 
   getPanelInstructionMessage() {
     const { groupBy } = this.props;
-    return groupBy && groupBy.length > 0 ? this.props.panelDescription : this.props.noColumnsSelectedMessage;
+    return groupBy && groupBy.length > 0
+      ? this.props.panelDescription
+      : this.props.noColumnsSelectedMessage;
   }
 
   renderGroupedColumns() {
@@ -40,16 +43,17 @@ class GroupedColumnsPanel extends Component {
 
   renderOverlay(color) {
     return (
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        height: '100%',
-        width: '100%',
-        zIndex: 1,
-        opacity: 0.5,
-        backgroundColor: color
-      }}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          height: '100%',
+          width: '100%',
+          zIndex: 1,
+          opacity: 0.5,
+          backgroundColor: color
+        }}
       />
     );
   }
@@ -57,11 +61,21 @@ class GroupedColumnsPanel extends Component {
   render() {
     const { connectDropTarget, isOver, canDrop } = this.props;
     return connectDropTarget(
-      <div style={{ padding: '2px', position: 'relative', margin: '-10px', display: 'inline-block', border: '1px solid #eee' }}>
-        {this.renderGroupedColumns()} <span>{this.getPanelInstructionMessage()}</span>
+      <div
+        style={{
+          padding: '2px',
+          position: 'relative',
+          margin: '-10px',
+          display: 'inline-block',
+          border: '1px solid #eee'
+        }}
+      >
+        {this.renderGroupedColumns()}{' '}
+        <span>{this.getPanelInstructionMessage()}</span>
         {isOver && canDrop && this.renderOverlay('yellow')}
         {!isOver && canDrop && this.renderOverlay('#DBECFA')}
-      </div>);
+      </div>
+    );
   }
 }
 
@@ -84,4 +98,6 @@ function collect(connect, monitor) {
   };
 }
 
-export default DropTarget(DragItemTypes.Column, columnTarget, collect)(GroupedColumnsPanel);
+export default DropTarget(DragItemTypes.Column, columnTarget, collect)(
+  GroupedColumnsPanel
+);

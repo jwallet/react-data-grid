@@ -22,11 +22,19 @@ import {
   isSelectedCellEditable,
   selectedRangeIsSingleCell,
   NextSelectedCellPosition
-} from '../utils/selectedCellUtils';
+} from '../utils/SelectedCellUtils';
 
 // Types
 import { UpdateActions, CellNavigationMode, EventTypes } from '../common/enums';
-import { CalculatedColumn, Position, SelectedRange, Dimension, InteractionMasksMetaData, CommitEvent, ColumnMetrics } from '../common/types';
+import {
+  CalculatedColumn,
+  Position,
+  SelectedRange,
+  Dimension,
+  InteractionMasksMetaData,
+  CommitEvent,
+  ColumnMetrics
+} from '../common/types';
 import { CanvasProps } from '../Canvas';
 
 export enum KeyCodes {
@@ -45,7 +53,8 @@ interface NavAction {
   onHitBoundary(next: Position): void;
 }
 
-type SharedCanvasProps<R, K extends keyof R> = Pick<CanvasProps<R, K>,
+type SharedCanvasProps<R, K extends keyof R> = Pick<
+CanvasProps<R, K>,
 | 'rowGetter'
 | 'rowsCount'
 | 'rowHeight'
@@ -55,9 +64,12 @@ type SharedCanvasProps<R, K extends keyof R> = Pick<CanvasProps<R, K>,
 | 'eventBus'
 | 'contextMenu'
 | 'editorPortalTarget'
-> & Pick<ColumnMetrics<R>, 'columns'>;
+> &
+Pick<ColumnMetrics<R>, 'columns'>;
 
-export interface InteractionMasksProps<R, K extends keyof R> extends SharedCanvasProps<R, K>, InteractionMasksMetaData<R> {
+export interface InteractionMasksProps<R, K extends keyof R>
+  extends SharedCanvasProps<R, K>,
+  InteractionMasksMetaData<R> {
   onHitTopBoundary(position: Position): void;
   onHitBottomBoundary(position: Position): void;
   onHitLeftBoundary(position: Position): void;
@@ -80,7 +92,10 @@ export interface InteractionMasksState {
   firstEditorKeyPress: string | null;
 }
 
-export default class InteractionMasks<R, K extends keyof R> extends React.Component<InteractionMasksProps<R, K>, InteractionMasksState> {
+export default class InteractionMasks<
+  R,
+  K extends keyof R
+> extends React.Component<InteractionMasksProps<R, K>, InteractionMasksState> {
   static displayName = 'InteractionMasks';
 
   readonly state: Readonly<InteractionMasksState> = {
@@ -90,10 +105,12 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     },
     selectedRange: {
       topLeft: {
-        idx: -1, rowIdx: -1
+        idx: -1,
+        rowIdx: -1
       },
       bottomRight: {
-        idx: -1, rowIdx: -1
+        idx: -1,
+        rowIdx: -1
       },
       startCell: null,
       cursorCell: null,
@@ -110,11 +127,21 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
 
   private unsubscribeEventHandlers: Array<() => void> = [];
 
-  componentDidUpdate(prevProps: InteractionMasksProps<R, K>, prevState: InteractionMasksState) {
+  componentDidUpdate(
+    prevProps: InteractionMasksProps<R, K>,
+    prevState: InteractionMasksState
+  ) {
     const { selectedPosition, isEditorEnabled } = this.state;
-    const { selectedPosition: prevSelectedPosition, isEditorEnabled: prevIsEditorEnabled } = prevState;
-    const isSelectedPositionChanged = selectedPosition !== prevSelectedPosition && (selectedPosition.rowIdx !== prevSelectedPosition.rowIdx || selectedPosition.idx !== prevSelectedPosition.idx);
-    const isEditorClosed = isEditorEnabled !== prevIsEditorEnabled && !isEditorEnabled;
+    const {
+      selectedPosition: prevSelectedPosition,
+      isEditorEnabled: prevIsEditorEnabled
+    } = prevState;
+    const isSelectedPositionChanged =
+      selectedPosition !== prevSelectedPosition
+      && (selectedPosition.rowIdx !== prevSelectedPosition.rowIdx
+        || selectedPosition.idx !== prevSelectedPosition.idx);
+    const isEditorClosed =
+      isEditorEnabled !== prevIsEditorEnabled && !isEditorEnabled;
 
     if (isSelectedPositionChanged) {
       // Call event handlers if selected cell has changed
@@ -128,7 +155,11 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
       }
     }
 
-    if ((isSelectedPositionChanged && this.isCellWithinBounds(selectedPosition)) || isEditorClosed) {
+    if (
+      (isSelectedPositionChanged
+        && this.isCellWithinBounds(selectedPosition))
+      || isEditorClosed
+    ) {
       this.focus();
     }
   }
@@ -138,8 +169,14 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
 
     this.unsubscribeEventHandlers = [
       eventBus.subscribe(EventTypes.SELECT_CELL, this.selectCell),
-      eventBus.subscribe(EventTypes.SELECT_START, this.onSelectCellRangeStarted),
-      eventBus.subscribe(EventTypes.SELECT_UPDATE, this.onSelectCellRangeUpdated),
+      eventBus.subscribe(
+        EventTypes.SELECT_START,
+        this.onSelectCellRangeStarted
+      ),
+      eventBus.subscribe(
+        EventTypes.SELECT_UPDATE,
+        this.onSelectCellRangeUpdated
+      ),
       eventBus.subscribe(EventTypes.SELECT_END, this.onSelectCellRangeEnded),
       eventBus.subscribe(EventTypes.DRAG_ENTER, this.handleDragEnter)
     ];
@@ -157,16 +194,23 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     if (!this.selectionMask.current) return null;
 
     const { editorPortalTarget } = this.props;
-    const { left: selectionMaskLeft, top: selectionMaskTop } = this.selectionMask.current.getBoundingClientRect();
+    const {
+      left: selectionMaskLeft,
+      top: selectionMaskTop
+    } = this.selectionMask.current.getBoundingClientRect();
     if (editorPortalTarget === document.body) {
-      const { scrollLeft, scrollTop } = document.scrollingElement || document.documentElement;
+      const { scrollLeft, scrollTop } =
+        document.scrollingElement || document.documentElement;
       return {
         left: selectionMaskLeft + scrollLeft,
         top: selectionMaskTop + scrollTop
       };
     }
 
-    const { left: portalTargetLeft, top: portalTargetTop } = editorPortalTarget.getBoundingClientRect();
+    const {
+      left: portalTargetLeft,
+      top: portalTargetTop
+    } = editorPortalTarget.getBoundingClientRect();
     const { scrollLeft, scrollTop } = editorPortalTarget;
     return {
       left: selectionMaskLeft - portalTargetLeft + scrollLeft,
@@ -183,15 +227,33 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
       this.onPressTab(e);
     } else if (this.isKeyboardNavigationEvent(e)) {
       this.changeCellFromEvent(e);
-    } else if (isKeyPrintable(e.keyCode) || ([KeyCodes.Backspace, KeyCodes.Delete, KeyCodes.Enter] as number[]).includes(e.keyCode)) {
+    } else if (
+      isKeyPrintable(e.keyCode)
+      || ([
+        KeyCodes.Backspace,
+        KeyCodes.Delete,
+        KeyCodes.Enter
+      ] as number[]).includes(e.keyCode)
+    ) {
       this.openEditor(e);
     }
   };
 
   isSelectedCellEditable(): boolean {
-    const { enableCellSelect, columns, rowGetter, onCheckCellIsEditable } = this.props;
+    const {
+      enableCellSelect,
+      columns,
+      rowGetter,
+      onCheckCellIsEditable
+    } = this.props;
     const { selectedPosition } = this.state;
-    return isSelectedCellEditable<R>({ enableCellSelect, columns, rowGetter, selectedPosition, onCheckCellIsEditable });
+    return isSelectedCellEditable<R>({
+      enableCellSelect,
+      columns,
+      rowGetter,
+      selectedPosition,
+      onCheckCellIsEditable
+    });
   }
 
   openEditor = (event?: React.KeyboardEvent<HTMLDivElement>): void => {
@@ -217,7 +279,11 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
       if (keyCode === KeyCodes.c) {
         const { columns, rowGetter } = this.props;
         const { selectedPosition } = this.state;
-        const value = getSelectedCellValue({ selectedPosition, columns, rowGetter });
+        const value = getSelectedCellValue({
+          selectedPosition,
+          columns,
+          rowGetter
+        });
         this.handleCopy(value);
       } else if (keyCode === KeyCodes.v) {
         this.handlePaste();
@@ -241,7 +307,14 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     }
 
     // If we are in a position to leave the grid, stop editing but stay in that cell
-    if (canExitGrid(e, { cellNavigationMode, columns, rowsCount, selectedPosition })) {
+    if (
+      canExitGrid(e, {
+        cellNavigationMode,
+        columns,
+        rowsCount,
+        selectedPosition
+      })
+    ) {
       if (isEditorEnabled) {
         this.closeEditor();
         return;
@@ -299,36 +372,57 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
       });
     }
 
-    onGridRowsUpdated(cellKey, toRow, toRow, { [cellKey]: value }, UpdateActions.COPY_PASTE, fromRow);
+    onGridRowsUpdated(
+      cellKey,
+      toRow,
+      toRow,
+      { [cellKey]: value },
+      UpdateActions.COPY_PASTE,
+      fromRow
+    );
   }
 
   isKeyboardNavigationEvent(e: React.KeyboardEvent<HTMLDivElement>): boolean {
     return this.getKeyNavActionFromEvent(e) !== null;
   }
 
-  getKeyNavActionFromEvent(e: React.KeyboardEvent<HTMLDivElement>): NavAction | null {
-    const { colVisibleEndIdx, colVisibleStartIdx, onHitBottomBoundary, onHitRightBoundary, onHitLeftBoundary, onHitTopBoundary } = this.props;
+  getKeyNavActionFromEvent(
+    e: React.KeyboardEvent<HTMLDivElement>
+  ): NavAction | null {
+    const {
+      colVisibleEndIdx,
+      colVisibleStartIdx,
+      onHitBottomBoundary,
+      onHitRightBoundary,
+      onHitLeftBoundary,
+      onHitTopBoundary
+    } = this.props;
     const isCellAtBottomBoundary = (cell: Position): boolean => {
-      return (cell.rowIdx + 1) * this.props.rowHeight > this.props.scrollTop + this.props.height;
+      return (
+        (cell.rowIdx + 1) * this.props.rowHeight
+        > this.props.scrollTop + this.props.height
+      );
     };
     const isCellAtTopBoundary = (cell: Position): boolean => {
       return cell.rowIdx * this.props.rowHeight < this.props.scrollTop;
     };
-    const isCellAtRightBoundary = (cell: Position): boolean => cell.idx !== 0 && cell.idx >= colVisibleEndIdx - 1;
-    const isCellAtLeftBoundary = (cell: Position): boolean => cell.idx !== 0 && cell.idx <= colVisibleStartIdx + 1;
+    const isCellAtRightBoundary = (cell: Position): boolean =>
+      cell.idx !== 0 && cell.idx >= colVisibleEndIdx - 1;
+    const isCellAtLeftBoundary = (cell: Position): boolean =>
+      cell.idx !== 0 && cell.idx <= colVisibleStartIdx + 1;
 
     const ArrowDown: NavAction = {
-      getNext: (current) => ({ ...current, rowIdx: current.rowIdx + 1 }),
+      getNext: current => ({ ...current, rowIdx: current.rowIdx + 1 }),
       isCellAtBoundary: isCellAtBottomBoundary,
       onHitBoundary: onHitBottomBoundary
     };
     const ArrowUp: NavAction = {
-      getNext: (current) => ({ ...current, rowIdx: current.rowIdx - 1 }),
+      getNext: current => ({ ...current, rowIdx: current.rowIdx - 1 }),
       isCellAtBoundary: isCellAtTopBoundary,
       onHitBoundary: onHitTopBoundary
     };
     const ArrowRight: NavAction = {
-      getNext: (current) => ({ ...current, idx: current.idx + 1 }),
+      getNext: current => ({ ...current, idx: current.idx + 1 }),
       isCellAtBoundary: isCellAtRightBoundary,
       onHitBoundary(next) {
         onHitRightBoundary(next);
@@ -339,7 +433,7 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
       }
     };
     const ArrowLeft: NavAction = {
-      getNext: (current) => ({ ...current, idx: current.idx - 1 }),
+      getNext: current => ({ ...current, idx: current.idx - 1 }),
       isCellAtBoundary: isCellAtLeftBoundary,
       onHitBoundary(next) {
         onHitLeftBoundary(next);
@@ -355,11 +449,16 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     }
 
     switch (e.key) {
-      case 'ArrowDown': return ArrowDown;
-      case 'ArrowUp': return ArrowUp;
-      case 'ArrowRight': return ArrowRight;
-      case 'ArrowLeft': return ArrowLeft;
-      default: return null;
+      case 'ArrowDown':
+        return ArrowDown;
+      case 'ArrowUp':
+        return ArrowUp;
+      case 'ArrowRight':
+        return ArrowRight;
+      case 'ArrowLeft':
+        return ArrowLeft;
+      default:
+        return null;
     }
   }
 
@@ -369,9 +468,10 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     const isShift = e.shiftKey;
 
     if (isTab) {
-      const cellNavigationMode = this.props.cellNavigationMode === CellNavigationMode.NONE
-        ? CellNavigationMode.CHANGE_ROW
-        : this.props.cellNavigationMode;
+      const cellNavigationMode =
+        this.props.cellNavigationMode === CellNavigationMode.NONE
+          ? CellNavigationMode.CHANGE_ROW
+          : this.props.cellNavigationMode;
       this.changeCellFromKeyAction(e, cellNavigationMode);
     } else if (isShift) {
       this.changeSelectedRangeFromArrowKeyAction(e);
@@ -380,28 +480,48 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     }
   }
 
-  changeCellFromKeyAction(e: React.KeyboardEvent<HTMLDivElement>, cellNavigationMode: CellNavigationMode): void {
+  changeCellFromKeyAction(
+    e: React.KeyboardEvent<HTMLDivElement>,
+    cellNavigationMode: CellNavigationMode
+  ): void {
     const keyNavAction = this.getKeyNavActionFromEvent(e);
     if (keyNavAction) {
       const currentPosition = this.state.selectedPosition;
-      const next = this.getNextSelectedCellPositionForKeyNavAction(keyNavAction, currentPosition, cellNavigationMode);
+      const next = this.getNextSelectedCellPositionForKeyNavAction(
+        keyNavAction,
+        currentPosition,
+        cellNavigationMode
+      );
       this.checkIsAtGridBoundary(keyNavAction, next);
       this.selectCell(next);
     }
   }
 
-  changeSelectedRangeFromArrowKeyAction(e: React.KeyboardEvent<HTMLDivElement>): void {
+  changeSelectedRangeFromArrowKeyAction(
+    e: React.KeyboardEvent<HTMLDivElement>
+  ): void {
     const keyNavAction = this.getKeyNavActionFromEvent(e);
     if (keyNavAction) {
       const { cellNavigationMode } = this.props;
-      const currentPosition = this.state.selectedRange.cursorCell || this.state.selectedPosition;
-      const next = this.getNextSelectedCellPositionForKeyNavAction(keyNavAction, currentPosition, cellNavigationMode);
+      const currentPosition =
+        this.state.selectedRange.cursorCell || this.state.selectedPosition;
+      const next = this.getNextSelectedCellPositionForKeyNavAction(
+        keyNavAction,
+        currentPosition,
+        cellNavigationMode
+      );
       this.checkIsAtGridBoundary(keyNavAction, next);
-      this.onSelectCellRangeUpdated({ ...next }, true, () => { this.onSelectCellRangeEnded(); });
+      this.onSelectCellRangeUpdated({ ...next }, true, () => {
+        this.onSelectCellRangeEnded();
+      });
     }
   }
 
-  getNextSelectedCellPositionForKeyNavAction(keyNavAction: NavAction, currentPosition: Position, cellNavigationMode: CellNavigationMode): NextSelectedCellPosition {
+  getNextSelectedCellPositionForKeyNavAction(
+    keyNavAction: NavAction,
+    currentPosition: Position,
+    cellNavigationMode: CellNavigationMode
+  ): NextSelectedCellPosition {
     const { getNext } = keyNavAction;
     const nextPosition = getNext(currentPosition);
     const { columns, rowsCount } = this.props;
@@ -413,7 +533,10 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     });
   }
 
-  checkIsAtGridBoundary(keyNavAction: NavAction, next: NextSelectedCellPosition): void {
+  checkIsAtGridBoundary(
+    keyNavAction: NavAction,
+    next: NextSelectedCellPosition
+  ): void {
     const { isCellAtBoundary, onHitBoundary } = keyNavAction;
     const { changeRowOrColumn, ...nextPos } = next;
     if (isCellAtBoundary(nextPos) || changeRowOrColumn) {
@@ -423,7 +546,9 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
 
   isCellWithinBounds({ idx, rowIdx }: Position): boolean {
     const { columns, rowsCount } = this.props;
-    return rowIdx >= 0 && rowIdx < rowsCount && idx >= 0 && idx < columns.length;
+    return (
+      rowIdx >= 0 && rowIdx < rowsCount && idx >= 0 && idx < columns.length
+    );
   }
 
   isGridSelected(): boolean {
@@ -470,7 +595,10 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     }, callback);
   };
 
-  createSingleCellSelectedRange(cellPosition: Position, isDragging: boolean): SelectedRange {
+  createSingleCellSelectedRange(
+    cellPosition: Position,
+    isDragging: boolean
+  ): SelectedRange {
     return {
       topLeft: cellPosition,
       bottomRight: cellPosition,
@@ -481,47 +609,67 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
   }
 
   onSelectCellRangeStarted = (selectedPosition: Position): void => {
-    this.setState({
-      selectedRange: this.createSingleCellSelectedRange(selectedPosition, true),
-      selectedPosition
-    }, () => {
-      if (this.props.onCellRangeSelectionStarted) {
-        this.props.onCellRangeSelectionStarted(this.state.selectedRange);
+    this.setState(
+      {
+        selectedRange: this.createSingleCellSelectedRange(
+          selectedPosition,
+          true
+        ),
+        selectedPosition
+      },
+      () => {
+        if (this.props.onCellRangeSelectionStarted) {
+          this.props.onCellRangeSelectionStarted(this.state.selectedRange);
+        }
       }
-    });
+    );
   };
 
-  onSelectCellRangeUpdated = (cellPosition: Position, isFromKeyboard?: boolean, callback?: () => void): void => {
-    if (!this.state.selectedRange.isDragging && !isFromKeyboard || !this.isCellWithinBounds(cellPosition)) {
+  onSelectCellRangeUpdated = (
+    cellPosition: Position,
+    isFromKeyboard?: boolean,
+    callback?: () => void
+  ): void => {
+    if (
+      (!this.state.selectedRange.isDragging && !isFromKeyboard)
+      || !this.isCellWithinBounds(cellPosition)
+    ) {
       return;
     }
 
-    const startCell = this.state.selectedRange.startCell || this.state.selectedPosition;
+    const startCell =
+      this.state.selectedRange.startCell || this.state.selectedPosition;
     const colIdxs = [startCell.idx, cellPosition.idx].sort((a, b) => a - b);
-    const rowIdxs = [startCell.rowIdx, cellPosition.rowIdx].sort((a, b) => a - b);
+    const rowIdxs = [startCell.rowIdx, cellPosition.rowIdx].sort(
+      (a, b) => a - b
+    );
     const topLeft: Position = { idx: colIdxs[0], rowIdx: rowIdxs[0] };
     const bottomRight: Position = { idx: colIdxs[1], rowIdx: rowIdxs[1] };
 
     const selectedRange: SelectedRange = {
       ...this.state.selectedRange,
       // default the startCell to the selected cell, in case we've just started via keyboard
-      startCell: this.state.selectedRange.startCell || this.state.selectedPosition,
+      startCell:
+        this.state.selectedRange.startCell || this.state.selectedPosition,
       // assign the new state - the bounds of the range, and the new cursor cell
       topLeft,
       bottomRight,
       cursorCell: cellPosition
     };
 
-    this.setState({
-      selectedRange
-    }, () => {
-      if (this.props.onCellRangeSelectionUpdated) {
-        this.props.onCellRangeSelectionUpdated(this.state.selectedRange);
+    this.setState(
+      {
+        selectedRange
+      },
+      () => {
+        if (this.props.onCellRangeSelectionUpdated) {
+          this.props.onCellRangeSelectionUpdated(this.state.selectedRange);
+        }
+        if (callback) {
+          callback();
+        }
       }
-      if (callback) {
-        callback();
-      }
-    });
+    );
   };
 
   onSelectCellRangeEnded = (): void => {
@@ -578,12 +726,22 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     const { rowIdx, overRowIdx } = draggedPosition;
     const { columns, onGridRowsUpdated, rowGetter } = this.props;
     const column = columns[draggedPosition.idx];
-    const value = getSelectedCellValue({ selectedPosition: draggedPosition, columns, rowGetter });
+    const value = getSelectedCellValue({
+      selectedPosition: draggedPosition,
+      columns,
+      rowGetter
+    });
     const cellKey = column.key;
     const fromRow = rowIdx < overRowIdx ? rowIdx : overRowIdx;
     const toRow = rowIdx > overRowIdx ? rowIdx : overRowIdx;
 
-    onGridRowsUpdated(cellKey, fromRow, toRow, { [cellKey]: value }, UpdateActions.CELL_DRAG);
+    onGridRowsUpdated(
+      cellKey,
+      fromRow,
+      toRow,
+      { [cellKey]: value },
+      UpdateActions.CELL_DRAG
+    );
 
     this.setState({
       draggedPosition: null
@@ -611,18 +769,29 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     return rowIdx * this.props.rowHeight;
   }
 
-  getSelectedDimensions = (selectedPosition: Position, useGridColumns = false): Dimension => {
+  getSelectedDimensions = (
+    selectedPosition: Position,
+    useGridColumns = false
+  ): Dimension => {
     const { scrollLeft, rowHeight, getRowColumns } = this.props;
-    const columns = useGridColumns ? this.props.columns : getRowColumns(selectedPosition.rowIdx);
+    const columns = useGridColumns
+      ? this.props.columns
+      : getRowColumns(selectedPosition.rowIdx);
     const top = this.getRowTop(selectedPosition.rowIdx);
-    const dimension = getSelectedDimensions({ selectedPosition, columns, scrollLeft, rowHeight });
+    const dimension = getSelectedDimensions({
+      selectedPosition,
+      columns,
+      scrollLeft,
+      rowHeight
+    });
     dimension.top = top;
     return dimension;
   };
 
   renderSingleCellSelectView() {
     return (
-      !this.state.isEditorEnabled && this.isGridSelected() && (
+      !this.state.isEditorEnabled
+      && this.isGridSelected() && (
         <SelectionMask
           {...this.getSelectedDimensions(this.state.selectedPosition, true)}
           ref={this.selectionMask}
@@ -644,7 +813,11 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
     return (
       <>
         <SelectionRangeMask
-          {...getSelectedRangeDimensions({ selectedRange: this.state.selectedRange, columns, rowHeight })}
+          {...getSelectedRangeDimensions({
+            selectedRange: this.state.selectedRange,
+            columns,
+            rowHeight
+          })}
         />
         <SelectionMask
           {...this.getSelectedDimensions(this.state.selectedPosition, true)}
@@ -655,16 +828,28 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
   }
 
   render() {
-    const { rowGetter, contextMenu, getRowColumns, scrollLeft, scrollTop, editorPortalTarget } = this.props;
-    const { isEditorEnabled, firstEditorKeyPress, selectedPosition, draggedPosition, copiedPosition } = this.state;
+    const {
+      rowGetter,
+      contextMenu,
+      getRowColumns,
+      scrollLeft,
+      scrollTop,
+      editorPortalTarget
+    } = this.props;
+    const {
+      isEditorEnabled,
+      firstEditorKeyPress,
+      selectedPosition,
+      draggedPosition,
+      copiedPosition
+    } = this.state;
     const rowData = rowGetter(selectedPosition.rowIdx);
     const columns = getRowColumns(selectedPosition.rowIdx);
     return (
-      <div
-        onKeyDown={this.onKeyDown}
-        onFocus={this.onFocus}
-      >
-        {copiedPosition && <CopyMask {...this.getSelectedDimensions(copiedPosition)} />}
+      <div onKeyDown={this.onKeyDown} onFocus={this.onFocus}>
+        {copiedPosition && (
+          <CopyMask {...this.getSelectedDimensions(copiedPosition)} />
+        )}
         {draggedPosition && (
           <DragMask
             draggedPosition={draggedPosition}
@@ -681,7 +866,9 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
               onCommit={this.onCommit}
               onCommitCancel={this.onCommitCancel}
               rowIdx={selectedPosition.rowIdx}
-              value={getSelectedCellValue({ selectedPosition, columns, rowGetter })!}
+              value={
+                getSelectedCellValue({ selectedPosition, columns, rowGetter })!
+              }
               rowData={rowData}
               column={columns[selectedPosition.idx]}
               scrollLeft={scrollLeft}
@@ -691,10 +878,11 @@ export default class InteractionMasks<R, K extends keyof R> extends React.Compon
             />
           </EditorPortal>
         )}
-        {isElement(contextMenu) && createPortal(
-          cloneElement(contextMenu, { ...selectedPosition }),
-          editorPortalTarget
-        )}
+        {isElement(contextMenu)
+          && createPortal(
+            cloneElement(contextMenu, { ...selectedPosition }),
+            editorPortalTarget
+          )}
       </div>
     );
   }

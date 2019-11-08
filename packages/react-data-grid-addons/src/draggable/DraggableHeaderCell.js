@@ -1,7 +1,7 @@
 import { DragSource } from 'react-dnd';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DragItemTypes } from 'react-data-grid';
+import { DragItemTypes } from '@vooban/react-data-grid';
 
 class DraggableHeaderCell extends Component {
   static propTypes = {
@@ -23,7 +23,9 @@ class DraggableHeaderCell extends Component {
     if (isDragging) {
       return null;
     }
-    return connectDragSource(<div className="rdg-draggable-header-cell">{this.props.children}</div>);
+    return connectDragSource(
+      <div className="rdg-draggable-header-cell">{this.props.children}</div>
+    );
   }
 }
 
@@ -44,4 +46,6 @@ const headerCellSource = {
   }
 };
 
-export default DragSource(DragItemTypes.Column, headerCellSource, collect)(DraggableHeaderCell);
+export default DragSource(DragItemTypes.Column, headerCellSource, collect)(
+  DraggableHeaderCell
+);

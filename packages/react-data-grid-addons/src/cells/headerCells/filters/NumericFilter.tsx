@@ -1,5 +1,5 @@
 import React from 'react';
-import { Column } from 'react-data-grid';
+import { Column } from '@vooban/react-data-grid';
 
 enum RuleType {
   Number = 1,
@@ -10,7 +10,10 @@ enum RuleType {
 
 type Rule =
   | { type: RuleType.Range; begin: number; end: number }
-  | { type: RuleType.GreaterThen | RuleType.LessThen | RuleType.Number; value: number };
+  | {
+    type: RuleType.GreaterThen | RuleType.LessThen | RuleType.Number;
+    value: number;
+  };
 
 interface ChangeEvent<R> {
   filterTerm: Rule[] | null;
@@ -46,7 +49,8 @@ export default function NumericFilter<R>({ column, onChange }: Props<R>) {
 
   const inputKey = `header-filter-${column.key as keyof R}`;
 
-  const tooltipText = 'Input Methods: Range (x-y), Greater Than (>x), Less Than (<y)';
+  const tooltipText =
+    'Input Methods: Range (x-y), Greater Than (>x), Less Than (<y)';
 
   return (
     <div className="rdg-filter-container">
@@ -57,19 +61,24 @@ export default function NumericFilter<R>({ column, onChange }: Props<R>) {
         onChange={handleChange}
         onKeyPress={handleKeyPress}
       />
-      <span className="rdg-filter-badge" title={tooltipText}>?</span>
+      <span className="rdg-filter-badge" title={tooltipText}>
+        ?
+      </span>
     </div>
   );
 }
 
-
-function filterValues<R>(row: R, columnFilter: { filterTerm: { [key in string]: Rule } }, columnKey: keyof R) {
+function filterValues<R>(
+  row: R,
+  columnFilter: { filterTerm: { [key in string]: Rule } },
+  columnKey: keyof R
+) {
   if (columnFilter.filterTerm == null) {
     return true;
   }
 
   // implement default filter logic
-  const value = parseInt(row[columnKey] as unknown as string, 10);
+  const value = parseInt((row[columnKey] as unknown) as string, 10);
   for (const ruleKey in columnFilter.filterTerm) {
     const rule = columnFilter.filterTerm[ruleKey];
 
@@ -108,29 +117,31 @@ export function getRules(value: string): Rule[] {
   }
 
   // handle each value with comma
-  return value.split(',').map((str): Rule => {
-    // handle dash
-    const dashIdx = str.indexOf('-');
-    if (dashIdx > 0) {
-      const begin = parseInt(str.slice(0, dashIdx), 10);
-      const end = parseInt(str.slice(dashIdx + 1), 10);
-      return { type: RuleType.Range, begin, end };
-    }
+  return value.split(',').map(
+    (str): Rule => {
+      // handle dash
+      const dashIdx = str.indexOf('-');
+      if (dashIdx > 0) {
+        const begin = parseInt(str.slice(0, dashIdx), 10);
+        const end = parseInt(str.slice(dashIdx + 1), 10);
+        return { type: RuleType.Range, begin, end };
+      }
 
-    // handle greater then
-    if (str.includes('>')) {
-      const begin = parseInt(str.slice(str.indexOf('>') + 1), 10);
-      return { type: RuleType.GreaterThen, value: begin };
-    }
+      // handle greater then
+      if (str.includes('>')) {
+        const begin = parseInt(str.slice(str.indexOf('>') + 1), 10);
+        return { type: RuleType.GreaterThen, value: begin };
+      }
 
-    // handle less then
-    if (str.includes('<')) {
-      const end = parseInt(str.slice(str.indexOf('<') + 1), 10);
-      return { type: RuleType.LessThen, value: end };
-    }
+      // handle less then
+      if (str.includes('<')) {
+        const end = parseInt(str.slice(str.indexOf('<') + 1), 10);
+        return { type: RuleType.LessThen, value: end };
+      }
 
-    // handle normal values
-    const numericValue = parseInt(str, 10);
-    return { type: RuleType.Number, value: numericValue };
-  });
+      // handle normal values
+      const numericValue = parseInt(str, 10);
+      return { type: RuleType.Number, value: numericValue };
+    }
+  );
 }

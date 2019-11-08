@@ -1,15 +1,20 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import Grid from 'react-data-grid';
+import Grid from '@vooban/react-data-grid';
 
 describe('Grid', () => {
-  const setup = (extraProps) => {
+  const setup = extraProps => {
     const columns = [
       { key: 'id', name: 'ID', width: 100, events: { onClick() {} } },
       { key: 'title', name: 'Title', width: 100 },
       { key: 'count', name: 'Count', width: 100 },
-      { key: 'country', name: 'Country', width: 100, events: { onClick() {}, onDoubleClick() {}, onDragOver() {} } }
+      {
+        key: 'country',
+        name: 'Country',
+        width: 100,
+        events: { onClick() {}, onDoubleClick() {}, onDragOver() {} }
+      }
     ];
 
     const rows = [];
@@ -26,7 +31,9 @@ describe('Grid', () => {
     const props = {
       enableCellSelect: true,
       columns,
-      rowGetter(i) { return rows[i]; },
+      rowGetter(i) {
+        return rows[i];
+      },
       rowsCount: rows.length,
       minWidth: 300,
       onCellCopyPaste() {},
@@ -41,11 +48,11 @@ describe('Grid', () => {
     return { wrapper, props, columns, rows };
   };
 
-  const getBaseHeader = (wrapper) => {
+  const getBaseHeader = wrapper => {
     return wrapper.find('ForwardRef(Header)');
   };
 
-  const getBaseCanvas = (wrapper) => {
+  const getBaseCanvas = wrapper => {
     return wrapper.find('Canvas');
   };
 
@@ -130,15 +137,23 @@ describe('Grid', () => {
 
   describe('onRowClick handler', () => {
     it('calls handler when row (cell) clicked', () => {
-      const rows = [{ id: '1', isSelected: true }, { id: '2', isSelected: false }];
-      const columns = [{ name: 'Id', key: 'id' }, { name: 'Title', key: 'title', width: 100 }];
+      const rows = [
+        { id: '1', isSelected: true },
+        { id: '2', isSelected: false }
+      ];
+      const columns = [
+        { name: 'Id', key: 'id' },
+        { name: 'Title', key: 'title', width: 100 }
+      ];
 
       let rowClicked = {};
       let rowClicks = 0;
 
       const { wrapper } = setup({
         rowsCount: rows.length,
-        rowGetter(i) { return rows[i]; },
+        rowGetter(i) {
+          return rows[i];
+        },
         columns,
         onRowClick(rowIdx, row, column) {
           rowClicked = { row, column };
@@ -146,7 +161,9 @@ describe('Grid', () => {
         }
       });
 
-      getBaseCanvas(wrapper).props().cellMetaData.onCellClick({ idx: 1, rowIdx: 1 });
+      getBaseCanvas(wrapper)
+        .props()
+        .cellMetaData.onCellClick({ idx: 1, rowIdx: 1 });
       expect(rowClicks).toBe(1);
       const { row, column } = rowClicked;
       expect(row).toMatchObject(rows[1]);
