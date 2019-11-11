@@ -1,6 +1,6 @@
 import React from 'react';
-import DataGrid, { SelectColumn } from 'react-data-grid';
-import { Editors, Toolbar, Formatters } from 'react-data-grid-addons';
+import DataGrid, { SelectColumn } from '@vooban/react-data-grid';
+import { Editors, Toolbar, Formatters } from '@vooban/react-data-grid-addons';
 import update from 'immutability-helper';
 import faker from 'faker';
 import Wrapper from './Wrapper';

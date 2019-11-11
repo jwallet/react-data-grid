@@ -1,6 +1,6 @@
 import React from 'react';
-import DataGrid from 'react-data-grid';
-import { DraggableHeader } from 'react-data-grid-addons';
+import DataGrid from '@vooban/react-data-grid';
+import { DraggableHeader } from '@vooban/react-data-grid-addons';
 import Wrapper from './Wrapper';
 
 const { DraggableContainer } = DraggableHeader;

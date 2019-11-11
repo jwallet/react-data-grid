@@ -1,6 +1,6 @@
 import React from 'react';
-import DataGrid from 'react-data-grid';
-import { Editors, Formatters } from 'react-data-grid-addons';
+import DataGrid from '@vooban/react-data-grid';
+import { Editors, Formatters } from '@vooban/react-data-grid-addons';
 import update from 'immutability-helper';
 import Wrapper from './Wrapper';
 

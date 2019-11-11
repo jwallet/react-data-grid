@@ -1,5 +1,5 @@
 import React from 'react';
-import DataGrid, { valueCellContentRenderer } from 'react-data-grid';
+import DataGrid, { valueCellContentRenderer } from '@vooban/react-data-grid';
 import Wrapper from './Wrapper';
 
 const columns = [

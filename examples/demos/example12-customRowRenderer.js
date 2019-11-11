@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DataGrid from 'react-data-grid';
+import DataGrid from '@vooban/react-data-grid';
 import Wrapper from './Wrapper';
 
 class RowRenderer extends React.Component {

@@ -1,5 +1,5 @@
 import React from 'react';
-import DataGrid from 'react-data-grid';
+import DataGrid from '@vooban/react-data-grid';
 import Wrapper from './Wrapper';
 
 class EmptyRowsView extends React.Component {

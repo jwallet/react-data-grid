@@ -1,6 +1,6 @@
 import React from 'react';
-import DataGrid from 'react-data-grid';
-import { Toolbar, Filters, Data } from 'react-data-grid-addons';
+import DataGrid from '@vooban/react-data-grid';
+import { Toolbar, Filters, Data } from '@vooban/react-data-grid-addons';
 import Wrapper from './Wrapper';
 
 const { NumericFilter, AutoCompleteFilter, MultiSelectFilter, SingleSelectFilter } = Filters;

@@ -1,5 +1,5 @@
 import React from 'react';
-import DataGrid from 'react-data-grid';
+import DataGrid from '@vooban/react-data-grid';
 import update from 'immutability-helper';
 import Wrapper from './Wrapper';
 

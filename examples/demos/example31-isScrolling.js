@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import DataGrid, { valueCellContentRenderer } from 'react-data-grid';
+import DataGrid, { valueCellContentRenderer } from '@vooban/react-data-grid';
 import { AreaChart, Area } from 'Recharts';
 import Wrapper from './Wrapper';
 

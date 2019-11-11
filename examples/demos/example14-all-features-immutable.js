@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DataGrid from 'react-data-grid';
-import { Editors, Toolbar, Menu, Formatters } from 'react-data-grid-addons';
+import DataGrid from '@vooban/react-data-grid';
+import { Editors, Toolbar, Menu, Formatters } from '@vooban/react-data-grid-addons';
 import faker from 'faker';
 import Wrapper from './Wrapper';
 import FakeObjectDataStore from './FakeObjectDataStore';

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import DataGrid, { SelectColumn, valueCellContentRenderer } from 'react-data-grid';
+import DataGrid, { SelectColumn, valueCellContentRenderer } from '@vooban/react-data-grid';
 import Wrapper from './Wrapper';
 
 function formatDecimal({ column, rowData, isSummaryRow, maximumFractionDigits = 2 }) {

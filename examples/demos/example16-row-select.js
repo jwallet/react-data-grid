@@ -1,5 +1,5 @@
 import React from 'react';
-import DataGrid, { SelectColumn } from 'react-data-grid';
+import DataGrid, { SelectColumn } from '@vooban/react-data-grid';
 import Wrapper from './Wrapper';
 
 export default class extends React.Component {

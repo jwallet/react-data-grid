@@ -1,6 +1,6 @@
 import React from 'react';
-import DataGrid from 'react-data-grid';
-import { Toolbar, Data } from 'react-data-grid-addons';
+import DataGrid from '@vooban/react-data-grid';
+import { Toolbar, Data } from '@vooban/react-data-grid-addons';
 import Wrapper from './Wrapper';
 
 const { Selectors } = Data;
