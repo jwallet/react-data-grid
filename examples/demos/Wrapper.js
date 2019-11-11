@@ -1,5 +1,4 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { Menu, MenuOpen } from '@material-ui/icons';
 
 export default function Wrapper({ title, children }) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -13,7 +12,9 @@ export default function Wrapper({ title, children }) {
 
   return (
     <div className="example">
-      <h1 onClick={() => setIsSidebarVisible(!isSidebarVisible)}>{isSidebarVisible ? <MenuOpen /> : <Menu />} {title}</h1>
+      <h1 onClick={() => setIsSidebarVisible(!isSidebarVisible)}>
+        <span>{isSidebarVisible}</span> {title}
+      </h1>
       {children}
     </div>
   );

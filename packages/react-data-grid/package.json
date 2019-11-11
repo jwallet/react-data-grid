@@ -27,8 +27,6 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@material-ui/core": "^4.5.1",
-    "@material-ui/icons": "^4.5.1",
     "classnames": "^2.2.6",
     "react-is": "^16.10.2",
     "tslib": "^1.10.0"

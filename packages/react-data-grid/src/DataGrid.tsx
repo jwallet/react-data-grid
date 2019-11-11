@@ -247,7 +247,8 @@ function DataGrid<R, K extends keyof R>({
 
   function handleColumnResize(column: CalculatedColumn<R>, width: number) {
     const newColumnWidths = new Map(columnWidths);
-    width = Math.max(width, minColumnWidth);
+    const minWidth = typeof column.minWidth === 'number' ? column.minWidth : minColumnWidth;
+    width = Math.max(width, minWidth);
     newColumnWidths.set(column.key, width);
     setColumnWidths(newColumnWidths);
 
