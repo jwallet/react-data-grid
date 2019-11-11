@@ -1,6 +1,6 @@
 {
   "name": "@vooban/react-data-grid-addons",
-  "version": "0.1.12",
+  "version": "0.2.0",
   "description": "A set of addons for react-data-grid",
   "author": "Vooban & Adazzle",
   "license": "MIT",
@@ -25,7 +25,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@vooban/react-data-grid": "^0.1.12",
+    "@vooban/react-data-grid": "^0.2.0",
     "lodash.groupby": "^4.6.0",
     "prop-types": "^15.7.2",
     "react-contextmenu": "^2.11.0",
