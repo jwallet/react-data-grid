@@ -734,8 +734,8 @@ describe('<InteractionMasks/>', () => {
   });
 
   describe('Drag functionality', () => {
-    const setupDrag = () => {
-      const selectedPosition = { idx: 1, rowIdx: 2 };
+    const setupDrag = (rowIdx = 2) => {
+      const selectedPosition = { idx: 1, rowIdx };
       const rows = [
         { Column1: '1' },
         { Column1: '2' },
