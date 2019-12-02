@@ -1,6 +1,9 @@
 import { CalculatedColumn, ColumnMetrics } from '../common/types';
 
-function getTotalFrozenColumnWidth<R>(columns: CalculatedColumn<R>[], lastFrozenColumnIndex: number): number {
+function getTotalFrozenColumnWidth<R>(
+  columns: CalculatedColumn<R>[],
+  lastFrozenColumnIndex: number
+): number {
   if (lastFrozenColumnIndex === -1) {
     return 0;
   }
@@ -8,7 +11,11 @@ function getTotalFrozenColumnWidth<R>(columns: CalculatedColumn<R>[], lastFrozen
   return lastFrozenColumn.left + lastFrozenColumn.width;
 }
 
-function getColumnCountForWidth<R>(columns: CalculatedColumn<R>[], initialWidth: number, colVisibleStartIdx: number): number {
+function getColumnCountForWidth<R>(
+  columns: CalculatedColumn<R>[],
+  initialWidth: number,
+  colVisibleStartIdx: number
+): number {
   let width = initialWidth;
   let count = 0;
 
@@ -33,9 +40,20 @@ export function getVerticalRangeToRender(
 ) {
   const overscanThreshold = 4;
   const rowVisibleStartIdx = Math.floor(scrollTop / rowHeight);
-  const rowVisibleEndIdx = Math.min(rowsCount - 1, Math.floor((scrollTop + height) / rowHeight));
-  const rowOverscanStartIdx = Math.max(0, Math.floor((rowVisibleStartIdx - overscanThreshold) / renderBatchSize) * renderBatchSize);
-  const rowOverscanEndIdx = Math.min(rowsCount - 1, Math.ceil((rowVisibleEndIdx + overscanThreshold) / renderBatchSize) * renderBatchSize);
+  const rowVisibleEndIdx = Math.min(
+    rowsCount - 1,
+    Math.floor((scrollTop + height) / rowHeight)
+  );
+  const rowOverscanStartIdx = Math.max(
+    0,
+    Math.floor((rowVisibleStartIdx - overscanThreshold) / renderBatchSize)
+      * renderBatchSize
+  );
+  const rowOverscanEndIdx = Math.min(
+    rowsCount - 1,
+    Math.ceil((rowVisibleEndIdx + overscanThreshold) / renderBatchSize)
+      * renderBatchSize
+  );
 
   return [rowOverscanStartIdx, rowOverscanEndIdx] as const;
 }
@@ -63,23 +81,46 @@ export function getHorizontalRangeToRender<R>({
   let columnIndex = lastFrozenColumnIndex;
   let hiddenColumnsWidth = 0;
   while (remainingScroll >= 0 && columnIndex < columns.length) {
-    columnIndex++;
-    const column = columns[columnIndex];
-    remainingScroll -= column.width;
+    const { width = 0 } = columns[columnIndex];
+    remainingScroll -= width;
     if (remainingScroll >= 0) {
-      hiddenColumnsWidth += column.width;
+      hiddenColumnsWidth += width;
     }
+    columnIndex++;
   }
   const colVisibleStartIdx = Math.max(columnIndex, 0);
-  const firstVisibleColumnHiddenWidth = scrollLeft - hiddenColumnsWidth;
 
-  const totalFrozenColumnWidth = getTotalFrozenColumnWidth(columns, lastFrozenColumnIndex);
-  viewportWidth = viewportWidth > 0 ? viewportWidth + firstVisibleColumnHiddenWidth : totalColumnWidth;
+  const totalFrozenColumnWidth = getTotalFrozenColumnWidth(
+    columns,
+    lastFrozenColumnIndex
+  );
+
+  if (viewportWidth > 0) {
+    const firstVisibleColumnHiddenWidth = scrollLeft - hiddenColumnsWidth;
+    viewportWidth += firstVisibleColumnHiddenWidth;
+  } else if (remainingScroll > totalColumnWidth) {
+    viewportWidth = scrollLeft - totalColumnWidth;
+  } else {
+    viewportWidth = totalColumnWidth;
+  }
+
   const availableWidth = viewportWidth - totalFrozenColumnWidth;
-  const nonFrozenRenderedColumnCount = getColumnCountForWidth(columns, availableWidth, colVisibleStartIdx);
-  const colVisibleEndIdx = Math.min(columns.length - 1, colVisibleStartIdx + nonFrozenRenderedColumnCount);
+  const nonFrozenRenderedColumnCount = getColumnCountForWidth(
+    columns,
+    availableWidth,
+    colVisibleStartIdx
+  );
+  const colVisibleEndIdx = Math.min(
+    columns.length - 1,
+    colVisibleStartIdx + nonFrozenRenderedColumnCount
+  );
   const colOverscanStartIdx = Math.max(0, colVisibleStartIdx - 1);
   const colOverscanEndIdx = Math.min(columns.length - 1, colVisibleEndIdx + 1);
 
-  return { colVisibleStartIdx, colVisibleEndIdx, colOverscanStartIdx, colOverscanEndIdx };
+  return {
+    colVisibleStartIdx,
+    colVisibleEndIdx,
+    colOverscanStartIdx,
+    colOverscanEndIdx
+  };
 }
