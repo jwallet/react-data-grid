@@ -1,4 +1,4 @@
-import { CalculatedColumn, ColumnMetrics } from '../common/types';
+import { CalculatedColumn, ColumnMetrics } from "../common/types";
 
 function getTotalFrozenColumnWidth<R>(
   columns: CalculatedColumn<R>[],
@@ -46,13 +46,13 @@ export function getVerticalRangeToRender(
   );
   const rowOverscanStartIdx = Math.max(
     0,
-    Math.floor((rowVisibleStartIdx - overscanThreshold) / renderBatchSize)
-      * renderBatchSize
+    Math.floor((rowVisibleStartIdx - overscanThreshold) / renderBatchSize) *
+      renderBatchSize
   );
   const rowOverscanEndIdx = Math.min(
     rowsCount - 1,
-    Math.ceil((rowVisibleEndIdx + overscanThreshold) / renderBatchSize)
-      * renderBatchSize
+    Math.ceil((rowVisibleEndIdx + overscanThreshold) / renderBatchSize) *
+      renderBatchSize
   );
 
   return [rowOverscanStartIdx, rowOverscanEndIdx] as const;
@@ -77,16 +77,23 @@ export function getHorizontalRangeToRender<R>({
   const { columns, totalColumnWidth, lastFrozenColumnIndex } = columnMetrics;
   let { viewportWidth } = columnMetrics;
 
-  let remainingScroll = scrollLeft;
-  let columnIndex = Math.max(0, lastFrozenColumnIndex);
+  // Get valid left scroll position.
+  // When we're scrolled all the way to the right and we remove columns, the scrollLeft value will be outdated,
+  // and greater than what's possible, so we need to handle that case here.
+  let remainingScroll =
+    scrollLeft + viewportWidth > totalColumnWidth
+      ? totalColumnWidth - viewportWidth
+      : scrollLeft;
+
+  let columnIndex = lastFrozenColumnIndex;
   let hiddenColumnsWidth = 0;
-  while (remainingScroll >= 0 && columnIndex < columns.length) {
+  while (remainingScroll >= 0 && columnIndex < columns.length - 1) {
+    columnIndex++;
     const { width = 0 } = columns[columnIndex];
     remainingScroll -= width;
     if (remainingScroll >= 0) {
       hiddenColumnsWidth += width;
     }
-    columnIndex++;
   }
   const colVisibleStartIdx = Math.max(columnIndex, 0);
 
@@ -98,8 +105,6 @@ export function getHorizontalRangeToRender<R>({
   if (viewportWidth > 0) {
     const firstVisibleColumnHiddenWidth = scrollLeft - hiddenColumnsWidth;
     viewportWidth += firstVisibleColumnHiddenWidth;
-  } else if (remainingScroll > totalColumnWidth) {
-    viewportWidth = scrollLeft - totalColumnWidth;
   } else {
     viewportWidth = totalColumnWidth;
   }

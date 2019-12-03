@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import DataGrid, { valueCellContentRenderer } from '@vooban/react-data-grid';
-import { AreaChart, Area } from 'Recharts';
-import Wrapper from './Wrapper';
+import React, { useState, useEffect } from "react";
+import DataGrid, { valueCellContentRenderer } from "@vooban/react-data-grid";
+import { AreaChart, Area } from "Recharts";
+import Wrapper from "./Wrapper";
 
-const supportsIdleCallback = typeof window.requestIdleCallback === 'function';
+const supportsIdleCallback = typeof window.requestIdleCallback === "function";
 
 const getRandom = (min, max) => {
   min = Math.ceil(min);
@@ -14,24 +14,36 @@ const getRandom = (min, max) => {
 function ExpensiveFormatter() {
   const [isReady, setReady] = useState(false);
   const [items] = useState(() => {
-    return [...Array(1000).keys()].map(i => ({ name: `Page ${i}`, uv: getRandom(0, 4000), pv: getRandom(0, 4000), amt: getRandom(0, 4000) })).slice(0, 50);
+    return [...Array(1000).keys()]
+      .map(i => ({
+        name: `Page ${i}`,
+        uv: getRandom(0, 4000),
+        pv: getRandom(0, 4000),
+        amt: getRandom(0, 4000)
+      }))
+      .slice(0, 50);
   });
 
-  useEffect(supportsIdleCallback
-    ? () => {
-      const handle = window.requestIdleCallback(() => setReady(true), { timeout: 300 });
+  useEffect(
+    supportsIdleCallback
+      ? () => {
+          const handle = window.requestIdleCallback(() => setReady(true), {
+            timeout: 300
+          });
 
-      return () => {
-        window.cancelIdleCallback(handle);
-      };
-    }
-    : () => {
-      const handle = window.setTimeout(() => setReady(true), 1000);
+          return () => {
+            window.cancelIdleCallback(handle);
+          };
+        }
+      : () => {
+          const handle = window.setTimeout(() => setReady(true), 1000);
 
-      return () => {
-        window.clearTimeout(handle);
-      };
-    }, [isReady]);
+          return () => {
+            window.clearTimeout(handle);
+          };
+        },
+    [isReady]
+  );
 
   if (!isReady) return <div>delayed rendering...</div>;
 
@@ -47,35 +59,57 @@ function ExpensiveFormatter() {
   );
 }
 
-const createColumns = (numberCols) => [...Array(numberCols).keys()].map(i => {
-  const column = {
-    key: `col${i}`,
-    name: `col${i}`
-  };
-  if (i === 3) {
-    column.cellContentRenderer = () => <ExpensiveFormatter />;
-    column.width = 500;
-  }
-  return column;
-});
+const createColumns = numberCols =>
+  [...Array(numberCols).keys()].map(i => {
+    const column = {
+      key: `col${i}`,
+      name: `col${i}`
+    };
+    if (i === 3) {
+      column.cellContentRenderer = () => <ExpensiveFormatter />;
+      column.width = 500;
+    }
+    return column;
+  });
 
-const createRows = (numberRows) => [...Array(numberRows).keys()].map(i => {
-  return [...Array(numberRows).keys()].reduce((row, j) => ({ ...row, [`col${j}`]: `row ${i} col ${j}` }), {});
-});
+const createRows = numberRows =>
+  [...Array(numberRows).keys()].map(i => {
+    return [...Array(numberRows).keys()].reduce(
+      (row, j) => ({ ...row, [`col${j}`]: `row ${i} col ${j}` }),
+      {}
+    );
+  });
 
 export default class extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.state = { columns: createColumns(6), rows: createRows(200) };
+    this.state = {
+      columns: createColumns(5),
+      moreColumns: createColumns(50),
+      lessColumns: createColumns(5),
+      rows: createRows(200)
+    };
   }
 
-  rowGetter = (i) => {
+  rowGetter = i => {
     return this.state.rows[i];
   };
 
   render() {
     return (
       <Wrapper title="Efficient windowing demonstration">
+        <button
+          onClick={() =>
+            this.setState(state => ({
+              columns:
+                state.columns.length === 50
+                  ? state.lessColumns
+                  : state.moreColumns
+            }))
+          }
+        >
+          Display/Hide Columns
+        </button>
         <DataGrid
           columns={this.state.columns}
           rowGetter={this.rowGetter}
