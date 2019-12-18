@@ -10,13 +10,14 @@ class DraggableContainer extends React.Component {
   };
 
   render() {
-    return React.cloneElement(
-      React.Children.only(this.props.children), {
-        ...this.props,
-        draggableHeaderCell: DraggableHeaderCell
-      }
-    );
+    return React.cloneElement(React.Children.only(this.props.children), {
+      ...this.props,
+      draggableHeaderCell: DraggableHeaderCell
+    });
   }
 }
 
-export default html5DragDropContext(DraggableContainer);
+export const DraggableContainerWithDragDropContext = html5DragDropContext(
+  DraggableContainer
+);
+export const DraggableContainerWithoutDragDropContext = DraggableContainer;
