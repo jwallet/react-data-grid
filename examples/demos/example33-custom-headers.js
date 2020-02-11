@@ -6,6 +6,11 @@ const Header = ({ title, onTitleChange }) => (
   <button onClick={onTitleChange}>{title || "DEFAULT"}</button>
 );
 
+const defaultColumnProperties = {
+  resizable: true,
+  width: undefined
+};
+
 export default class extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -17,7 +22,6 @@ export default class extends React.Component {
       {
         key: "id",
         name: "ID",
-        frozen: true,
         headerRenderer: (
           <Header
             title={this.state.headers.id}
@@ -47,7 +51,7 @@ export default class extends React.Component {
           />
         )
       }
-    ];
+    ].map(c => ({ ...c, ...defaultColumnProperties }));
   }
 
   handleHeaderChange = (key, name) =>
@@ -86,6 +90,7 @@ export default class extends React.Component {
           rowsCount={this.state.rows.length}
           sortDirection={this.state.sortDirection}
           sortColumn={this.state.sortColumn}
+          minColumnWidth={80}
           minHeight={500}
         />
       </Wrapper>

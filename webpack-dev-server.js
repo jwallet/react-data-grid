@@ -1,49 +1,47 @@
-'use strict';
+"use strict";
 
-const webpack = require('webpack');
-const TerserPlugin = require('terser-webpack-plugin');
-const WebpackDevServer = require('webpack-dev-server');
+const webpack = require("webpack");
+const TerserPlugin = require("terser-webpack-plugin");
+const WebpackDevServer = require("webpack-dev-server");
 
-const RELEASE = process.argv.slice(2).includes('--release');
+const RELEASE = process.argv.slice(2).includes("--release");
 
 const config = {
-  mode: RELEASE ? 'production' : 'development',
-  devtool: 'eval-source-map',
+  mode: RELEASE ? "production" : "development",
+  devtool: "eval-source-map",
   entry: {
     index: [
-      'webpack-dev-server/client?http://localhost:8080/',
-      'webpack/hot/dev-server',
-      './examples',
-      './packages/react-data-grid/style/react-data-grid.less',
-      './packages/react-data-grid-addons/style/react-data-grid-addons.less',
-      './packages/react-data-grid-addons/node_modules/react-select/dist/react-select.css'
+      "webpack-dev-server/client?http://localhost:3020/",
+      "webpack/hot/dev-server",
+      "./examples",
+      "./packages/react-data-grid/style/react-data-grid.less",
+      "./packages/react-data-grid-addons/style/react-data-grid-addons.less",
+      "./packages/react-data-grid-addons/node_modules/react-select/dist/react-select.css"
     ]
   },
   resolve: {
     symlinks: false
   },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ],
+  plugins: [new webpack.HotModuleReplacementPlugin()],
   module: {
     rules: [
       {
         test: /\.js$/,
-        use: ['source-map-loader'],
-        enforce: 'pre'
+        use: ["source-map-loader"],
+        enforce: "pre"
       },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: ["babel-loader"]
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: ["style-loader", "css-loader"]
       },
       {
         test: /\.less$/,
-        use: ['style-loader', 'css-loader', 'less-loader']
+        use: ["style-loader", "css-loader", "less-loader"]
       }
     ],
     strictExportPresence: true
@@ -96,7 +94,7 @@ const compiler = webpack(config);
 const server = new WebpackDevServer(compiler, {
   hot: true,
   open: true,
-  contentBase: 'examples'
+  contentBase: "examples"
 });
 
-server.listen(8080, 'localhost');
+server.listen(3020, "localhost");
