@@ -1,4 +1,9 @@
-import { Column, CalculatedColumn, ColumnMetrics, CellContentRenderer } from '../common/types';
+import {
+  Column,
+  CalculatedColumn,
+  ColumnMetrics,
+  CellContentRenderer
+} from '../common/types';
 import { getScrollbarSize } from './domUtils';
 import { SelectColumn } from '../Columns';
 
@@ -10,23 +15,54 @@ interface Metrics<R> {
   defaultCellContentRenderer: CellContentRenderer<R>;
 }
 
+const comparer = (a: number, b: number) => {
+  if (a > b) return 1;
+  if (a < b) return -1;
+  return 0;
+};
+
+interface ColumnWidth {
+  idx: number;
+  minWidth: number;
+  width?: number;
+}
+
+const sortColumnMinWidths = (columnWidths: ColumnWidth[]) => {
+  const rowComparer = (a: ColumnWidth, b: ColumnWidth) => {
+    return -1 * comparer(a.minWidth, b.minWidth);
+  };
+  return columnWidths.slice().sort(rowComparer);
+};
+
+const setMinWidth = (minColumnWidths: ColumnWidth[], columnWidth: ColumnWidth, unallocatedColumnWidth: number) => {
+  const index = minColumnWidths.findIndex(({ idx }) => idx === columnWidth.idx);
+  if (typeof index === 'number') {
+    minColumnWidths[index].minWidth = Math.floor(unallocatedColumnWidth);
+  }
+  return minColumnWidths;
+};
+
 export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
   let left = 0;
   let totalWidth = 0;
-  let allocatedWidths = 0;
-  let unassignedColumnsCount = 0;
+  const minWidths: ColumnWidth[] = [];
   let lastFrozenColumnIndex = -1;
   const columns: Array<Column<R> & { width: number | void }> = [];
 
-  for (const metricsColumn of metrics.columns) {
-    const width = getSpecifiedWidth(metricsColumn, metrics.columnWidths, metrics.viewportWidth, metrics.minColumnWidth);
+  metrics.columns.forEach((metricsColumn: Column<R>, idx: number) => {
+    const width = getSpecifiedWidth(
+      metricsColumn,
+      metrics.columnWidths,
+      metrics.viewportWidth,
+      metrics.minColumnWidth
+    );
     const column = { ...metricsColumn, width };
 
-    if (width === undefined) {
-      unassignedColumnsCount++;
-    } else {
-      allocatedWidths += width;
-    }
+    minWidths.push({
+      idx,
+      minWidth: width || 0,
+      width: typeof metricsColumn.width === 'string' ? Number(metricsColumn.width) : metricsColumn.width
+    });
 
     if (isFrozen(column)) {
       lastFrozenColumnIndex++;
@@ -34,28 +70,40 @@ export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
     } else {
       columns.push(column);
     }
-  }
-
-  const unallocatedWidth = metrics.viewportWidth - allocatedWidths - getScrollbarSize();
-  const unallocatedColumnWidth = Math.max(
-    Math.floor(unallocatedWidth / unassignedColumnsCount),
-    metrics.minColumnWidth
-  );
-
-  const calculatedColumns: CalculatedColumn<R>[] = columns.map((column, idx) => {
-    // Every column should have a valid width as this stage
-    const width = column.width === undefined ? unallocatedColumnWidth : column.width;
-    const newColumn: CalculatedColumn<R> = {
-      ...column,
-      idx,
-      width,
-      left,
-      cellContentRenderer: column.cellContentRenderer || metrics.defaultCellContentRenderer
-    };
-    totalWidth += width;
-    left += width;
-    return newColumn;
   });
+
+  const isFixedWidth = (w: ColumnWidth) => w.width && w.width === w.minWidth;
+  const unallocatedWidth = metrics.viewportWidth - minWidths.reduce((acc, w) => isFixedWidth(w) ? acc + w.width! : acc, 0) - getScrollbarSize();
+  const columnsUnallocatedCount = columns.length - minWidths.reduce((acc, w) => isFixedWidth(w) ? acc + 1 : acc, 0);
+  let unallocatedColumnWidth = unallocatedWidth / columnsUnallocatedCount;
+
+  sortColumnMinWidths(minWidths).forEach((w, i) => {
+    if (isFixedWidth(w)) return;
+    if (w.minWidth > unallocatedColumnWidth) {
+      unallocatedColumnWidth -= (w.minWidth % unallocatedColumnWidth) / (columnsUnallocatedCount - (i + 1));
+    } else {
+      setMinWidth(minWidths, w, unallocatedColumnWidth);
+    }
+  });
+
+  const calculatedColumns: CalculatedColumn<R>[] = columns.map(
+    (column, idx) => {
+      const minWidth = (minWidths.find(w => w.idx === idx) || {}).minWidth || 0;
+      const allocatedWidth = column.width === undefined ? metrics.minColumnWidth : column.width;
+      const width = Math.max(minWidth, Math.min(metrics.minColumnWidth, allocatedWidth));
+      const newColumn = {
+        ...column,
+        idx,
+        width,
+        left,
+        cellContentRenderer:
+          column.cellContentRenderer || metrics.defaultCellContentRenderer
+      };
+      totalWidth += width;
+      left += width;
+      return newColumn;
+    }
+  );
 
   return {
     columns: calculatedColumns,
@@ -90,26 +138,32 @@ function getSpecifiedWidth<R>(
   defaultMinColumnWidth: number
 ): number | void {
   // get column min width from grid or column prop, fallback on defaultMinColumnWidth if undefined
-  const minWidth = typeof column.minWidth === 'number' ? column.minWidth : defaultMinColumnWidth;
   const width = getWidth(viewportWidth, column.width);
 
   // SelectColumn must always use width prop when defined
   if (column.key === SelectColumn.key) {
-    return width || minWidth;
+    return width || typeof column.minWidth === 'number' ? column.minWidth : defaultMinColumnWidth;
   }
 
   if (columnWidths.has(column.key)) {
     // Use the resized width if available
     return columnWidths.get(column.key);
   }
+
   if (width !== undefined) {
-    return Math.max(width, minWidth);
+    return width;
   }
+
+  return column.minWidth;
 }
 
 // Logic extented to allow for functions to be passed down in column.editable
 // this allows us to deicde whether we can be editing from a cell level
-export function canEdit<R>(column: CalculatedColumn<R>, rowData: R, enableCellSelect?: boolean): boolean {
+export function canEdit<R>(
+  column: CalculatedColumn<R>,
+  rowData: R,
+  enableCellSelect?: boolean
+): boolean {
   if (typeof column.editable === 'function') {
     return enableCellSelect === true && column.editable(rowData);
   }
@@ -120,7 +174,12 @@ export function isFrozen<R>(column: Column<R> | CalculatedColumn<R>): boolean {
   return column.frozen === true;
 }
 
-export function getColumnScrollPosition<R>(columns: CalculatedColumn<R>[], idx: number, currentScrollLeft: number, currentClientWidth: number): number {
+export function getColumnScrollPosition<R>(
+  columns: CalculatedColumn<R>[],
+  idx: number,
+  currentScrollLeft: number,
+  currentClientWidth: number
+): number {
   let left = 0;
   let frozen = 0;
 

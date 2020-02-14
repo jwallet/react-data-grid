@@ -22,6 +22,7 @@ export default class extends React.Component {
       {
         key: "id",
         name: "ID",
+        width: 50,
         headerRenderer: (
           <Header
             title={this.state.headers.id}
@@ -32,6 +33,7 @@ export default class extends React.Component {
       {
         key: "task",
         name: "Title",
+        minWidth: 300,
         headerRenderer: (
           <Header
             title={this.state.headers.task}
@@ -50,8 +52,20 @@ export default class extends React.Component {
             }
           />
         )
+      },
+      {
+        key: "triority",
+        name: "Triority",
+        headerRenderer: (
+          <Header
+            title={this.state.headers.triority}
+            onTitleChange={() =>
+              this.handleHeaderChange("triority", "Triority")
+            }
+          />
+        )
       }
-    ].map(c => ({ ...c, ...defaultColumnProperties }));
+    ].map(c => ({ ...defaultColumnProperties, ...c }));
   }
 
   handleHeaderChange = (key, name) =>
@@ -69,6 +83,9 @@ export default class extends React.Component {
         id: i,
         task: `Task ${i}`,
         priority: ["Critical", "High", "Medium", "Low"][
+          Math.floor(Math.random() * 3 + 1)
+        ],
+        triority: ["Critical", "High", "Medium", "Low"][
           Math.floor(Math.random() * 3 + 1)
         ]
       });
