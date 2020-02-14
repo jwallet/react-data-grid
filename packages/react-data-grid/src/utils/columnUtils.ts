@@ -53,8 +53,7 @@ export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
     const width = getSpecifiedWidth(
       metricsColumn,
       metrics.columnWidths,
-      metrics.viewportWidth,
-      metrics.minColumnWidth
+      metrics.viewportWidth
     );
     const column = { ...metricsColumn, width };
 
@@ -116,16 +115,16 @@ export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
 // get column width, fallback on defaultWidth when width is undefined
 function getWidth(
   viewportWidth: number,
-  minWidth?: number | string,
+  width?: number | string,
   defaultWidth?: number
 ): number | void {
-  switch (typeof minWidth) {
+  switch (typeof width) {
     case 'string':
-      return /^\d+%$/.test(minWidth)
-        ? Math.floor((viewportWidth * parseInt(minWidth, 10)) / 100)
+      return /^\d+%$/.test(width)
+        ? Math.floor((viewportWidth * parseInt(width, 10)) / 100)
         : defaultWidth;
     case 'number':
-      return minWidth;
+      return width;
     default:
       return defaultWidth;
   }
@@ -134,15 +133,14 @@ function getWidth(
 function getSpecifiedWidth<R>(
   column: Column<R>,
   columnWidths: Map<keyof R, number>,
-  viewportWidth: number,
-  defaultMinColumnWidth: number
+  viewportWidth: number
 ): number | void {
   // get column min width from grid or column prop, fallback on defaultMinColumnWidth if undefined
   const width = getWidth(viewportWidth, column.width);
 
   // SelectColumn must always use width prop when defined
   if (column.key === SelectColumn.key) {
-    return width || typeof column.minWidth === 'number' ? column.minWidth : defaultMinColumnWidth;
+    return width;
   }
 
   if (columnWidths.has(column.key)) {
