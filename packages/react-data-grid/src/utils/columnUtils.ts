@@ -22,7 +22,7 @@ const comparer = (a: number, b: number) => {
 };
 
 interface ColumnWidth {
-  idx: number;
+  key: string;
   minWidth: number;
   width?: number;
 }
@@ -35,7 +35,7 @@ const sortColumnMinWidths = (columnWidths: ColumnWidth[]) => {
 };
 
 const setMinWidth = (minColumnWidths: ColumnWidth[], columnWidth: ColumnWidth, unallocatedColumnWidth: number) => {
-  const index = minColumnWidths.findIndex(({ idx }) => idx === columnWidth.idx);
+  const index = minColumnWidths.findIndex(({ key }) => key === columnWidth.key);
   if (typeof index === 'number') {
     minColumnWidths[index].minWidth = Math.floor(unallocatedColumnWidth);
   }
@@ -49,7 +49,7 @@ export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
   let lastFrozenColumnIndex = -1;
   const columns: Array<Column<R> & { width: number | void }> = [];
 
-  metrics.columns.forEach((metricsColumn: Column<R>, idx: number) => {
+  for (const metricsColumn of metrics.columns) {
     const width = getSpecifiedWidth(
       metricsColumn,
       metrics.columnWidths,
@@ -57,10 +57,8 @@ export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
     );
     const column = { ...metricsColumn, width };
 
-    console.log(idx, column.key, width);
-
     minWidths.push({
-      idx,
+      key: column.key as string,
       minWidth: width || 0,
       width: typeof metricsColumn.width === 'string' ? Number(metricsColumn.width) : metricsColumn.width
     });
@@ -71,7 +69,7 @@ export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
     } else {
       columns.push(column);
     }
-  });
+  }
 
   const isFixedWidth = (w: ColumnWidth) => w.width && w.width === w.minWidth;
   const unallocatedWidth = metrics.viewportWidth - minWidths.reduce((acc, w) => isFixedWidth(w) ? acc + w.width! : acc, 0) - getScrollbarSize();
@@ -89,18 +87,11 @@ export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
 
   const calculatedColumns: CalculatedColumn<R>[] = columns.map(
     (column, idx) => {
-      const minWidth = (minWidths.find(w => w.idx === idx) || {}).minWidth || 0;
+      const minWidth = (minWidths.find(w => w.key === column.key) || {}).minWidth || 0;
       const allocatedWidth = column.width === undefined ? metrics.minColumnWidth : column.width;
       const width = Math.max(minWidth, Math.min(metrics.minColumnWidth, allocatedWidth));
-      console.log(idx, width, column.key);
-      const newColumn = {
-        ...column,
-        idx,
-        width,
-        left,
-        cellContentRenderer:
-          column.cellContentRenderer || metrics.defaultCellContentRenderer
-      };
+      const cellContentRenderer = column.cellContentRenderer || metrics.defaultCellContentRenderer;
+      const newColumn = { ...column, idx, width, left, cellContentRenderer };
       totalWidth += width;
       left += width;
       return newColumn;
