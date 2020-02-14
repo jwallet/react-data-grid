@@ -1,9 +1,9 @@
-import React from 'react';
-import DataGrid from '@vooban/react-data-grid';
-import Wrapper from './Wrapper';
+import React from "react";
+import DataGrid, { SelectColumn } from "@vooban/react-data-grid";
+import Wrapper from "./Wrapper";
 
 const Header = ({ title, onTitleChange }) => (
-  <button onClick={onTitleChange}>{title || 'DEFAULT'}</button>
+  <button onClick={onTitleChange}>{title || "DEFAULT"}</button>
 );
 
 const defaultColumnProperties = {
@@ -19,47 +19,48 @@ export default class extends React.Component {
     this.state = { originalRows, rows, headers: {} };
 
     this._columns = [
+      { ...SelectColumn, width: 40 },
       {
-        key: 'id',
-        name: 'ID',
-        width: 50,
+        key: "id",
+        name: "ID",
         headerRenderer: (
           <Header
             title={this.state.headers.id}
-            onTitleChange={() => this.handleHeaderChange('id', 'ID')}
+            onTitleChange={() => this.handleHeaderChange("id", "ID")}
           />
         )
       },
       {
-        key: 'task',
-        name: 'Title',
-        minWidth: 300,
+        key: "task",
+        name: "Title",
         headerRenderer: (
           <Header
             title={this.state.headers.task}
-            onTitleChange={() => this.handleHeaderChange('task', 'Title')}
+            onTitleChange={() => this.handleHeaderChange("task", "Title")}
           />
         )
       },
       {
-        key: 'priority',
-        name: 'Priority',
+        key: "priority",
+        name: "Priority",
         headerRenderer: (
           <Header
             title={this.state.headers.priority}
             onTitleChange={() =>
-              this.handleHeaderChange('priority', 'Priority')}
+              this.handleHeaderChange("priority", "Priority")
+            }
           />
         )
       },
       {
-        key: 'triority',
-        name: 'Triority',
+        key: "triority",
+        name: "Triority",
         headerRenderer: (
           <Header
             title={this.state.headers.triority}
             onTitleChange={() =>
-              this.handleHeaderChange('triority', 'Triority')}
+              this.handleHeaderChange("triority", "Triority")
+            }
           />
         )
       }
@@ -80,10 +81,10 @@ export default class extends React.Component {
       rows.push({
         id: i,
         task: `Task ${i}`,
-        priority: ['Critical', 'High', 'Medium', 'Low'][
+        priority: ["Critical", "High", "Medium", "Low"][
           Math.floor(Math.random() * 3 + 1)
         ],
-        triority: ['Critical', 'High', 'Medium', 'Low'][
+        triority: ["Critical", "High", "Medium", "Low"][
           Math.floor(Math.random() * 3 + 1)
         ]
       });

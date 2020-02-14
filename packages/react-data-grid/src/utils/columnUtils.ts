@@ -57,6 +57,8 @@ export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
     );
     const column = { ...metricsColumn, width };
 
+    console.log(idx, column.key, width);
+
     minWidths.push({
       idx,
       minWidth: width || 0,
@@ -90,6 +92,7 @@ export function getColumnMetrics<R>(metrics: Metrics<R>): ColumnMetrics<R> {
       const minWidth = (minWidths.find(w => w.idx === idx) || {}).minWidth || 0;
       const allocatedWidth = column.width === undefined ? metrics.minColumnWidth : column.width;
       const width = Math.max(minWidth, Math.min(metrics.minColumnWidth, allocatedWidth));
+      console.log(idx, width, column.key);
       const newColumn = {
         ...column,
         idx,
