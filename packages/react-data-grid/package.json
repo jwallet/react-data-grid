@@ -1,6 +1,6 @@
 {
   "name": "@vooban/react-data-grid",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Excel-like grid component built with React, with editors, keyboard navigation, copy & paste, and the like",
   "author": "Vooban & Adazzle",
   "license": "MIT",
