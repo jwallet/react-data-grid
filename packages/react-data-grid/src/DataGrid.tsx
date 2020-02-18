@@ -5,10 +5,8 @@ import React, {
   useEffect,
   useLayoutEffect,
   useMemo,
-  useImperativeHandle,
-  createElement
+  useImperativeHandle
 } from 'react';
-import { isValidElementType } from 'react-is';
 
 import Header, { HeaderHandle } from './Header';
 import Canvas from './Canvas';
@@ -436,36 +434,35 @@ function DataGrid<R, K extends keyof R>({
             getValidFilterValues={props.getValidFilterValues}
             cellMetaData={cellMetaData}
           />
-          {rowsCount === 0 && isValidElementType(props.emptyRowsView) ? createElement(props.emptyRowsView) : (
-            <Canvas<R, K>
-              rowKey={rowKey}
-              rowHeight={rowHeight}
-              rowRenderer={props.rowRenderer}
-              rowGetter={rowGetter}
-              rowsCount={rowsCount}
-              selectedRows={selectedRows}
-              onRowSelectionChange={handleRowSelectionChange}
-              columnMetrics={columnMetrics}
-              onScroll={handleScroll}
-              cellMetaData={cellMetaData}
-              height={minHeight - rowOffsetHeight}
-              scrollToRowIndex={props.scrollToRowIndex}
-              contextMenu={props.contextMenu}
-              getSubRowDetails={props.getSubRowDetails}
-              rowGroupRenderer={props.rowGroupRenderer}
-              enableCellSelect={enableCellSelect}
-              enableCellAutoFocus={enableCellAutoFocus}
-              cellNavigationMode={cellNavigationMode}
-              eventBus={eventBus}
-              interactionMasksMetaData={interactionMasksMetaData}
-              RowsContainer={props.RowsContainer}
-              editorPortalTarget={editorPortalTarget}
-              onCanvasKeydown={props.onGridKeyDown}
-              onCanvasKeyup={props.onGridKeyUp}
-              renderBatchSize={renderBatchSize}
-              summaryRows={props.summaryRows}
-            />
-          )}
+          <Canvas<R, K>
+            emptyRowsView={props.emptyRowsView}
+            rowKey={rowKey}
+            rowHeight={rowHeight}
+            rowRenderer={props.rowRenderer}
+            rowGetter={rowGetter}
+            rowsCount={rowsCount}
+            selectedRows={selectedRows}
+            onRowSelectionChange={handleRowSelectionChange}
+            columnMetrics={columnMetrics}
+            onScroll={handleScroll}
+            cellMetaData={cellMetaData}
+            height={minHeight - rowOffsetHeight}
+            scrollToRowIndex={props.scrollToRowIndex}
+            contextMenu={props.contextMenu}
+            getSubRowDetails={props.getSubRowDetails}
+            rowGroupRenderer={props.rowGroupRenderer}
+            enableCellSelect={enableCellSelect}
+            enableCellAutoFocus={enableCellAutoFocus}
+            cellNavigationMode={cellNavigationMode}
+            eventBus={eventBus}
+            interactionMasksMetaData={interactionMasksMetaData}
+            RowsContainer={props.RowsContainer}
+            editorPortalTarget={editorPortalTarget}
+            onCanvasKeydown={props.onGridKeyDown}
+            onCanvasKeyup={props.onGridKeyUp}
+            renderBatchSize={renderBatchSize}
+            summaryRows={props.summaryRows}
+          />
         </>
       )}
     </div>

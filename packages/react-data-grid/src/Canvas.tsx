@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, createElement } from 'react';
 
 import { EventTypes } from './common/enums';
 import { CalculatedColumn, CellMetaData, ColumnMetrics, InteractionMasksMetaData, Position, ScrollPosition } from './common/types';
@@ -10,6 +10,7 @@ import RowRenderer from './RowRenderer';
 import SummaryRowRenderer from './SummaryRowRenderer';
 import { getColumnScrollPosition, getScrollbarSize, isPositionStickySupported } from './utils';
 import { getHorizontalRangeToRender, getVerticalRangeToRender } from './utils/viewportUtils';
+import { isValidElementType } from 'react-is';
 
 type SharedDataGridProps<R, K extends keyof R> = Pick<DataGridProps<R, K>,
 | 'rowGetter'
@@ -37,6 +38,7 @@ export interface CanvasProps<R, K extends keyof R> extends SharedDataGridProps<R
   cellMetaData: CellMetaData<R>;
   height: number;
   eventBus: EventBus;
+  emptyRowsView?: React.ComponentType<{}>;
   interactionMasksMetaData: InteractionMasksMetaData<R>;
   onScroll(position: ScrollPosition): void;
   onCanvasKeydown?(e: React.KeyboardEvent<HTMLDivElement>): void;
@@ -69,6 +71,7 @@ export default function Canvas<R, K extends keyof R>({
   RowsContainer,
   rowsCount,
   scrollToRowIndex,
+  emptyRowsView,
   selectedRows,
   summaryRows
 }: CanvasProps<R, K>) {
@@ -208,7 +211,7 @@ export default function Canvas<R, K extends keyof R>({
         paddingBottom: (rowsCount - 1 - rowOverscanEndIdx) * rowHeight
       }}
     >
-      {getViewportRows()}
+      {rowsCount === 0 && isValidElementType(emptyRowsView) ? createElement(emptyRowsView) : getViewportRows()}
     </div>
   );
 
